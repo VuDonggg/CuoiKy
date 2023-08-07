@@ -54,6 +54,11 @@ public class CrockeryWarehouse extends JPanel {
                 model.addRow(vector);
             }
             table.setModel(model);
+            idTextField.setText("");
+            nameTextField.setText("");
+            priceTextField.setText("");
+            inStockTextField.setText("");
+            inforproduTextField.setText("");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -150,6 +155,7 @@ public class CrockeryWarehouse extends JPanel {
                     boolean Check = CrockeryDAO.insertCrockery(crockery);
                     CrockeryDAO.Notification(Check, "Thêm thành công", "Thêm thất bại");
                     UploadTabel();
+
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Error: " + ex.getMessage());
                 }
@@ -186,8 +192,17 @@ public class CrockeryWarehouse extends JPanel {
                         JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Chọn sản phẩm để chỉnh sửa");
                         return;
                     }
-
                     int id = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+
+                    int idFromTextField = Integer.parseInt(idTextField.getText());
+
+                    if (id != idFromTextField) {
+                        JOptionPane.showMessageDialog(CrockeryWarehouse.this,
+                                "Không thể thay đổi ID, Cập nhật thất bại",
+                                "Message",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                     String name = nameTextField.getText();
                     double price = Double.parseDouble(priceTextField.getText());
                     int inStock = Integer.parseInt(inStockTextField.getText());
@@ -200,6 +215,7 @@ public class CrockeryWarehouse extends JPanel {
                     boolean Check = CrockeryDAO.editCrockery(crockery);
                     CrockeryDAO.Notification(Check, "Cập nhật thành công", "Cập nhật thất bại");
                     UploadTabel();
+
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Error: " + ex.getMessage());
                 }

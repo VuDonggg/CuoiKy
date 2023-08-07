@@ -1,40 +1,30 @@
 package CuoiKy.Domain.Model;
 
-public class ConstructorFood extends ConstructorTemp {
-    private String DOM;
-    private String EXP;
+import java.util.Date;
 
-    public ConstructorFood(int id, String name, double price, int instock, String DOM, String EXP) {
+public class ConstructorFood extends ConstructorTemp {
+    private Date DOM;
+    private Date EXP;
+
+    public ConstructorFood(int id, String name, double price, int instock, Date DOM, Date EXP) {
         super(id, name, price, instock);
         this.DOM = DOM;
         this.EXP = EXP;
     }
 
-    /**
-     * @return String return the DOM
-     */
-    public String getDOM() {
+    public Date getDOM() {
         return DOM;
     }
 
-    /**
-     * @param DOM the DOM to set
-     */
-    public void setDOM(String DOM) {
+    public void setDOM(Date DOM) {
         this.DOM = DOM;
     }
 
-    /**
-     * @return String return the EXP
-     */
-    public String getEXP() {
+    public Date getEXP() {
         return EXP;
     }
 
-    /**
-     * @param EXP the EXP to set
-     */
-    public void setEXP(String EXP) {
+    public void setEXP(Date EXP) {
         this.EXP = EXP;
     }
 
