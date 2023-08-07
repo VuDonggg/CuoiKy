@@ -4,14 +4,21 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 
+import CuoiKy.Domain.Model.ConstructorCrockery;
 import CuoiKy.Presistence.Connect;
+import CuoiKy.Presistence.CrockeryDAO;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class CrockeryWarehouse extends JPanel {
     private DefaultTableModel tableModel;
@@ -52,6 +59,25 @@ public class CrockeryWarehouse extends JPanel {
         }
     }
 
+    private void handleTableRowSelection() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow >= 0) {
+            idTextField.setText(table.getValueAt(selectedRow, 0).toString());
+            nameTextField.setText(table.getValueAt(selectedRow, 1).toString());
+            priceTextField.setText(table.getValueAt(selectedRow, 2).toString());
+            inStockTextField.setText(table.getValueAt(selectedRow, 3).toString());
+            inforproduTextField.setText(table.getValueAt(selectedRow, 4).toString());
+
+            String dateString = table.getValueAt(selectedRow, 5).toString();
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
+                dateChooser.setDate(date);
+            } catch (Exception ex) {
+
+            }
+        }
+    }
+
     public CrockeryWarehouse() {
         setLayout(new BorderLayout());
 
@@ -73,9 +99,8 @@ public class CrockeryWarehouse extends JPanel {
         priceTextField = new JTextField();
         inforproduTextField = new JTextField();
 
-        // Use JDateChooser for "Ngày nhập kho" field
         dateChooser = new JDateChooser();
-        dateChooser.setDate(new Date()); // Set today's date as default
+        dateChooser.setDate(new Date());
 
         addButton = new JButton("Add");
         editButton = new JButton("Edit");
@@ -99,6 +124,97 @@ public class CrockeryWarehouse extends JPanel {
         inputPanel.add(editButton);
         inputPanel.add(deleteButton);
         inputPanel.add(findButton);
+
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                if (!event.getValueIsAdjusting()) {
+                    handleTableRowSelection();
+                }
+            }
+        });
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int id = Integer.parseInt(idTextField.getText());
+                    String name = nameTextField.getText();
+                    double price = Double.parseDouble(priceTextField.getText());
+                    int inStock = Integer.parseInt(inStockTextField.getText());
+                    String inforProducer = inforproduTextField.getText();
+                    Date dayAdd = dateChooser.getDate();
+
+                    ConstructorCrockery crockery = new ConstructorCrockery(id, name, price, inStock, inforProducer,
+                            dayAdd);
+
+                    boolean Check = CrockeryDAO.insertCrockery(crockery);
+                    CrockeryDAO.Notification(Check, "Thêm thành công", "Thêm thất bại");
+                    UploadTabel();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Error: " + ex.getMessage());
+                }
+            }
+        });
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow == -1) {
+                        JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Chọn sản phẩm để xóa");
+                        return;
+                    }
+
+                    int id = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+
+                    boolean Check = CrockeryDAO.deleteCrockery(id);
+                    CrockeryDAO.Notification(Check, "Xóa thành công", "Xóa thất bại");
+                    UploadTabel();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Error: " + ex.getMessage());
+                }
+            }
+        });
+
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow == -1) {
+                        JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Chọn sản phẩm để chỉnh sửa");
+                        return;
+                    }
+
+                    int id = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+                    String name = nameTextField.getText();
+                    double price = Double.parseDouble(priceTextField.getText());
+                    int inStock = Integer.parseInt(inStockTextField.getText());
+                    String inforProducer = inforproduTextField.getText();
+                    Date dayAdd = dateChooser.getDate();
+
+                    ConstructorCrockery crockery = new ConstructorCrockery(id, name, price, inStock, inforProducer,
+                            dayAdd);
+
+                    boolean Check = CrockeryDAO.editCrockery(crockery);
+                    CrockeryDAO.Notification(Check, "Cập nhật thành công", "Cập nhật thất bại");
+                    UploadTabel();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(CrockeryWarehouse.this, "Error: " + ex.getMessage());
+                }
+            }
+        });
+
+        findButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchText = JOptionPane.showInputDialog(CrockeryWarehouse.this,
+                        "Nhập tên sản phẩm để tìm kiếm: ");
+                DefaultTableModel model = CrockeryDAO.findCrockery(searchText);
+                table.setModel(model);
+            }
+        });
 
         add(inputPanel, BorderLayout.SOUTH);
         UploadTabel();

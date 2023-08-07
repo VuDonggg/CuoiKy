@@ -6,6 +6,8 @@ public class ConstructorFood extends ConstructorTemp {
 
     public ConstructorFood(int id, String name, double price, int instock, String DOM, String EXP) {
         super(id, name, price, instock);
+        this.DOM = DOM;
+        this.EXP = EXP;
     }
 
     /**

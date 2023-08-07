@@ -7,6 +7,10 @@ public class ConstructorTemp {
     private int instock;
 
     public ConstructorTemp(int id, String name, double price, int instock) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.instock = instock;
 
     }
 
