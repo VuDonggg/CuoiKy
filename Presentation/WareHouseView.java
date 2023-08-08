@@ -12,7 +12,7 @@ public class WareHouseView extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Crockery Warehouse", new CrockeryWarehouse());
         tabbedPane.addTab("Food Warehouse", new FoodWarehouse());
-        tabbedPane.addTab("Crockery Warehouse", new RefrigerationWarehouse());
+        tabbedPane.addTab("Refrigeration Warehouse", new RefrigerationWarehouse());
 
         add(tabbedPane);
 

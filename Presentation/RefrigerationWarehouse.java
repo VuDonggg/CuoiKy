@@ -4,14 +4,10 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.JTextComponent;
 
-import CuoiKy.Domain.Model.ConstructorRefrigeration;
 import CuoiKy.Presistence.Connect;
-import CuoiKy.Presistence.RefrigerationDAO;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,7 +29,7 @@ public class RefrigerationWarehouse extends JPanel {
 
     public void UploadTable() {
         try {
-            String[] sql = { "Id", "Name", "Prince", "Instock", "Wat", "Guarantee" };
+            String[] sql = { "Id", "Name", "Price", "Instock", "Wat", "Guarantee" };
             DefaultTableModel model = new DefaultTableModel(sql, 0);
 
             Connection connection = Connect.getConnection();
@@ -114,9 +110,6 @@ public class RefrigerationWarehouse extends JPanel {
         inputPanel.add(deleteButton);
         inputPanel.add(findButton);
 
-        add(inputPanel, BorderLayout.SOUTH);
-        UploadTable();
-
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
                 if (!event.getValueIsAdjusting()) {
@@ -124,114 +117,12 @@ public class RefrigerationWarehouse extends JPanel {
                 }
             }
         });
-
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int id = Integer.parseInt(idTextField.getText());
-                    String name = nameTextField.getText();
-                    double price = Double.parseDouble(priceTextField.getText());
-                    int inStock = Integer.parseInt(inStockTextField.getText());
-                    double wattage = Double.parseDouble(wattageTextField.getText());
-
-                    String guarantee = "";
-                    int selectedGuaranteeIndex = guaranteeComboBox.getSelectedIndex();
-                    if (selectedGuaranteeIndex > 0) {
-                        guarantee = guaranteeComboBox.getSelectedItem().toString();
-                    } else {
-                        JOptionPane.showMessageDialog(RefrigerationWarehouse.this,
-                                "Vui lòng chọn thời gian bảo hành", "Message", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    ConstructorRefrigeration refrigeration = new ConstructorRefrigeration(id, name, price, inStock,
-                            wattage, guarantee);
-
-                    boolean check = RefrigerationDAO.insertRefrigeration(refrigeration);
-                    RefrigerationDAO.Notification(check, "Thêm thành công", "Thêm thất bại");
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(RefrigerationWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int selectedRow = table.getSelectedRow();
-                    if (selectedRow == -1) {
-                        JOptionPane.showMessageDialog(RefrigerationWarehouse.this, "Chọn sản phẩm để xóa");
-                        return;
-                    }
-
-                    int idToDelete = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-
-                    boolean check = RefrigerationDAO.deleteRefrigeration(idToDelete);
-                    RefrigerationDAO.Notification(check, "Xóa thành công", "Xóa thất bại");
-
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(RefrigerationWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int selectedRow = table.getSelectedRow();
-                    if (selectedRow == -1) {
-                        JOptionPane.showMessageDialog(RefrigerationWarehouse.this, "Chọn sản phẩm để chỉnh sửa");
-                        return;
-                    }
-
-                    int id = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-                    int idFromTextField = Integer.parseInt(idTextField.getText());
-
-                    if (id != idFromTextField) {
-                        JOptionPane.showMessageDialog(RefrigerationWarehouse.this,
-                                "Không thể thay đổi ID, cập nhật thất bại", "Message", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    String name = nameTextField.getText();
-                    double price = Double.parseDouble(priceTextField.getText());
-                    int inStock = Integer.parseInt(inStockTextField.getText());
-                    double wattage = Double.parseDouble(wattageTextField.getText());
-                    String guarantee = "";
-                    int selectedGuaranteeIndex = guaranteeComboBox.getSelectedIndex();
-                    if (selectedGuaranteeIndex > 0) {
-                        guarantee = guaranteeComboBox.getSelectedItem().toString();
-                    } else {
-                        JOptionPane.showMessageDialog(RefrigerationWarehouse.this,
-                                "Vui lòng chọn thời gian bảo hành", "Message", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                    ConstructorRefrigeration refrigeration = new ConstructorRefrigeration(id, name, price, inStock,
-                            wattage, guarantee);
-
-                    boolean check = RefrigerationDAO.editRefrigeration(refrigeration);
-                    RefrigerationDAO.Notification(check, "Cập nhật thành công", "Cập nhật thất bại");
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(RefrigerationWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        findButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String searchText = JOptionPane.showInputDialog(RefrigerationWarehouse.this,
-                        "Enter the name to search for:");
-                DefaultTableModel model = RefrigerationDAO.findRefrigeration(searchText);
-                table.setModel(model);
-            }
-        });
+        addButton.addActionListener(new AddRefri(this));
+        editButton.addActionListener(new EditRefri(this));
+        findButton.addActionListener(new FindRefri(this));
+        deleteButton.addActionListener(new DeleteRefri(this));
+        add(inputPanel, BorderLayout.SOUTH);
+        UploadTable();
 
     }
 
@@ -277,5 +168,33 @@ public class RefrigerationWarehouse extends JPanel {
             frame.setContentPane(new RefrigerationWarehouse());
             frame.setVisible(true);
         });
+    }
+
+    public JTextField getIdTextField() {
+        return idTextField;
+    }
+
+    public JTextField getNameTextField() {
+        return nameTextField;
+    }
+
+    public JTextField getPriceTextField() {
+        return priceTextField;
+    }
+
+    public JTextField getInStockTextField() {
+        return inStockTextField;
+    }
+
+    public JTable getTable() {
+        return table;
+    }
+
+    public JTextComponent getWattageTextField() {
+        return wattageTextField;
+    }
+
+    public JComboBox<String> getGuaranteeComboBox() {
+        return guaranteeComboBox;
     }
 }

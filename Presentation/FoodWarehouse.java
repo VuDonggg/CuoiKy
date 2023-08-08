@@ -5,8 +5,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,8 +16,6 @@ import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
 import CuoiKy.Presistence.Connect;
-import CuoiKy.Presistence.FoodDAO;
-import CuoiKy.Domain.Model.ConstructorFood;
 
 public class FoodWarehouse extends JPanel {
     private DefaultTableModel tableModel;
@@ -55,6 +51,11 @@ public class FoodWarehouse extends JPanel {
                 model.addRow(vector);
             }
             table.setModel(model);
+            idTextField.setText("");
+            nameTextField.setText("");
+            priceTextField.setText("");
+            inStockTextField.setText("");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -145,100 +146,45 @@ public class FoodWarehouse extends JPanel {
                 }
             }
         });
-
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int id = Integer.parseInt(idTextField.getText());
-                    String name = nameTextField.getText();
-                    double price = Double.parseDouble(priceTextField.getText());
-                    int inStock = Integer.parseInt(inStockTextField.getText());
-                    Date dateOfManu = dateOfManuChooser.getDate();
-                    Date dateOfExp = dateOfExpChooser.getDate();
-
-                    ConstructorFood food = new ConstructorFood(id, name, price, inStock, dateOfManu, dateOfExp);
-
-                    boolean Check = FoodDAO.insertFood(food);
-                    FoodDAO.Notification(Check, "Thêm thành công", "Thêm thất bại");
-
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(FoodWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int selectedRow = table.getSelectedRow();
-                    if (selectedRow == -1) {
-                        JOptionPane.showMessageDialog(FoodWarehouse.this, "Chọn sản phẩm để chỉnh sửa");
-                        return;
-                    }
-
-                    int id = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-
-                    int idFromTextField = Integer.parseInt(idTextField.getText());
-
-                    if (id != idFromTextField) {
-                        JOptionPane.showMessageDialog(FoodWarehouse.this, "Không thể thay đổi ID, cập nhật thất bại",
-                                "Message",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    String name = nameTextField.getText();
-                    double price = Double.parseDouble(priceTextField.getText());
-                    int inStock = Integer.parseInt(inStockTextField.getText());
-                    Date dateOfManu = dateOfManuChooser.getDate();
-                    Date dateOfExp = dateOfExpChooser.getDate();
-
-                    ConstructorFood food = new ConstructorFood(id, name, price, inStock, dateOfManu, dateOfExp);
-
-                    boolean Check = FoodDAO.editFood(food);
-                    FoodDAO.Notification(Check, "Cập nhật thành công", "Cập nhật thất bại");
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(FoodWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int selectedRow = table.getSelectedRow();
-                    if (selectedRow == -1) {
-                        JOptionPane.showMessageDialog(FoodWarehouse.this, "Chọn sản phẩm để xóa");
-                        return;
-                    }
-
-                    int idToDelete = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-
-                    boolean Check = FoodDAO.deleteFood(idToDelete);
-                    FoodDAO.Notification(Check, "Xóa thành công", "Xóa thất bại");
-
-                    UploadTable();
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(FoodWarehouse.this, "Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        findButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String searchText = JOptionPane.showInputDialog(FoodWarehouse.this, "Enter the name to search for:");
-                DefaultTableModel model = FoodDAO.findFood(searchText);
-                table.setModel(model);
-            }
-        });
+        addButton.addActionListener(new AddFood(this));
+        editButton.addActionListener(new EditFood(this));
+        findButton.addActionListener(new FindFood(this));
+        deleteButton.addActionListener(new DeleteFood(this));
 
         add(inputPanel, BorderLayout.SOUTH);
         UploadTable();
+    }
+
+    public JButton getAddButton() {
+        return addButton;
+    }
+
+    public JTextField getIdTextField() {
+        return idTextField;
+    }
+
+    public JTextField getNameTextField() {
+        return nameTextField;
+    }
+
+    public JTextField getPriceTextField() {
+        return priceTextField;
+    }
+
+    public JTextField getInStockTextField() {
+        return inStockTextField;
+    }
+
+    public JDateChooser getDateOfManuChooser() {
+        return dateOfManuChooser;
+    }
+
+    public JDateChooser getDateOfExpChooser() {
+        return dateOfExpChooser;
+    }
+
+    public JTable getTable() {
+        return table;
     }
 
     public static void main(String[] args) {
