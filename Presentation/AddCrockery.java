@@ -31,7 +31,7 @@ public class AddCrockery implements ActionListener {
             CrockeryDAO.Notification(Check, "Thêm thành công", "Thêm thất bại");
             crockeryWarehouse.UploadTabel();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(crockeryWarehouse, "Error: Nhập ID" + ex.getMessage());
+            JOptionPane.showMessageDialog(crockeryWarehouse, "Error: " + ex.getMessage());
         }
     }
 }

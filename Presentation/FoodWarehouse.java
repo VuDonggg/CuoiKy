@@ -30,6 +30,7 @@ public class FoodWarehouse extends JPanel {
     private JTextField priceTextField;
     private JDateChooser dateOfManuChooser;
     private JDateChooser dateOfExpChooser;
+    private FoodCommandProcessor commandProcessor;
 
     public void UploadTable() {
         try {
@@ -88,6 +89,8 @@ public class FoodWarehouse extends JPanel {
     }
 
     public FoodWarehouse() {
+        commandProcessor = new FoodCommandProcessor();
+
         setLayout(new BorderLayout());
 
         tableModel = new DefaultTableModel();
@@ -113,9 +116,9 @@ public class FoodWarehouse extends JPanel {
         deleteButton = new JButton("Delete");
         findButton = new JButton("Find");
 
-        dateOfManuChooser.setDateFormatString("dd/MM/yyyy"); // Format the date to display
+        dateOfManuChooser.setDateFormatString("dd/MM/yyyy");
         JTextFieldDateEditor editor1 = (JTextFieldDateEditor) dateOfManuChooser.getComponent(1);
-        editor1.setEditable(false); // Prevent manual editing
+        editor1.setEditable(false);
 
         dateOfExpChooser.setDateFormatString("dd/MM/yyyy");
         JTextFieldDateEditor editor2 = (JTextFieldDateEditor) dateOfExpChooser.getComponent(1);
@@ -146,6 +149,7 @@ public class FoodWarehouse extends JPanel {
                 }
             }
         });
+
         addButton.addActionListener(new AddFood(this));
         editButton.addActionListener(new EditFood(this));
         findButton.addActionListener(new FindFood(this));
@@ -153,6 +157,17 @@ public class FoodWarehouse extends JPanel {
 
         add(inputPanel, BorderLayout.SOUTH);
         UploadTable();
+
+    }
+
+    public void addButtonClicked() {
+        FoodCommand addCommand = new AddFoodCommand(this);
+        commandProcessor.addCommand(addCommand);
+        processCommands();
+    }
+
+    public void processCommands() {
+        commandProcessor.processCommands();
     }
 
     public JButton getAddButton() {
