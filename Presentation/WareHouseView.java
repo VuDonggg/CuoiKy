@@ -22,5 +22,6 @@ public class WareHouseView extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new WareHouseView());
         // HaiLiem deptrai over sai.
+        // Vippro ne
     }
 }
