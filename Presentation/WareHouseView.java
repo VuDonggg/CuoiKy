@@ -1,5 +1,6 @@
 package CuoiKy.Presentation;
 
+import CuoiKy.Presentation;
 import javax.swing.*;
 
 public class WareHouseView extends JFrame {
@@ -21,6 +22,6 @@ public class WareHouseView extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new WareHouseView());
-        // Hello Wan nheee
+        // Liem dang co gang de khong rot mon
     }
 }
