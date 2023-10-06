@@ -21,6 +21,6 @@ public class WareHouseView extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new WareHouseView());
-        // Liem dang co gang de khong rot mon nhaaa
+        // Liem dang co gang de khong rot mon
     }
 }
